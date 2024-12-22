@@ -13,6 +13,7 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
   const [token, setToken] = useState(localStorage.getItem('token'));
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   // Configure axios defaults
   useEffect(() => {
@@ -44,12 +45,14 @@ export function AuthProvider({ children }) {
       const res = await axios.get('/api/auth');
       setCurrentUser(res.data);
       setIsAuthenticated(true);
+      setIsAdmin(res.data.isAdmin);
     } catch (err) {
       console.error('Error loading user:', err);
       localStorage.removeItem('token');
       setToken(null);
       setCurrentUser(null);
       setIsAuthenticated(false);
+      setIsAdmin(false);
     }
     setLoading(false);
   };
@@ -87,6 +90,7 @@ export function AuthProvider({ children }) {
     setToken(null);
     setCurrentUser(null);
     setIsAuthenticated(false);
+    setIsAdmin(false);
     delete axios.defaults.headers.common['x-auth-token'];
   };
 
@@ -94,6 +98,7 @@ export function AuthProvider({ children }) {
     currentUser,
     loading,
     isAuthenticated,
+    isAdmin,
     register,
     login,
     logout

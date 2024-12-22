@@ -3,7 +3,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useState, useRef, useEffect } from 'react';
 
 function Navbar() {
-  const { isAuthenticated, currentUser, logout } = useAuth();
+  const { isAuthenticated, currentUser, isAdmin, logout } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef();
 
@@ -52,6 +52,11 @@ function Navbar() {
                     {currentUser?.name?.charAt(0)?.toUpperCase() || 'U'}
                   </div>
                   <span>{currentUser?.name || 'User'}</span>
+                  {isAdmin && (
+                    <span className="ml-2 px-2 py-1 text-xs bg-yellow-500 text-white rounded-full">
+                      Admin
+                    </span>
+                  )}
                 </button>
 
                 {isMenuOpen && (
@@ -63,14 +68,37 @@ function Navbar() {
                     >
                       Profile
                     </Link>
-                    {currentUser?.isAdmin && (
-                      <Link
-                        to="/admin"
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                        onClick={() => setIsMenuOpen(false)}
-                      >
-                        Admin Dashboard
-                      </Link>
+                    {isAdmin && (
+                      <>
+                        <Link
+                          to="/admin"
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                          onClick={() => setIsMenuOpen(false)}
+                        >
+                          Admin Dashboard
+                        </Link>
+                        <Link
+                          to="/admin/pets"
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                          onClick={() => setIsMenuOpen(false)}
+                        >
+                          Manage Pets
+                        </Link>
+                        <Link
+                          to="/admin/adoptions"
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                          onClick={() => setIsMenuOpen(false)}
+                        >
+                          Manage Adoptions
+                        </Link>
+                        <Link
+                          to="/admin/users"
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                          onClick={() => setIsMenuOpen(false)}
+                        >
+                          Manage Users
+                        </Link>
+                      </>
                     )}
                     <Link
                       to="/dashboard"
