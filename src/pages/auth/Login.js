@@ -21,7 +21,7 @@ const Login = () => {
     try {
       await login(formData);
       toast.success('Login successful!');
-      navigate('/dashboard', { replace: true });
+      navigate('/profile', { replace: true });
     } catch (err) {
       toast.error(err || 'Login failed');
     }

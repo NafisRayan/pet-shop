@@ -15,6 +15,7 @@ import AdminPanel from './pages/admin/AdminPanel';
 import PetRescue from './pages/PetRescue';
 import VetSearch from './pages/VetSearch';
 import Events from './pages/Events';
+import Profile from './pages/Profile';
 import PrivateRoute from './components/routes/PrivateRoute';
 import AdminRoute from './components/routes/AdminRoute';
 import { AuthProvider } from './context/AuthContext';
@@ -33,6 +34,14 @@ function App() {
               <Route path="/register" element={<Register />} />
               <Route path="/pets" element={<PetListing />} />
               
+              <Route
+                path="/profile"
+                element={
+                  <PrivateRoute>
+                    <Profile />
+                  </PrivateRoute>
+                }
+              />
               <Route
                 path="/adoption"
                 element={

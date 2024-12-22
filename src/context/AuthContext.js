@@ -1,6 +1,6 @@
 import { createContext, useState, useContext, useEffect } from 'react';
 import { auth } from '../services/firebase';
-import axios from 'axios';
+import axios from '../services/axios';
 
 const AuthContext = createContext();
 
@@ -14,15 +14,25 @@ export function AuthProvider({ children }) {
   const [token, setToken] = useState(localStorage.getItem('token'));
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
+  // Configure axios defaults
+  useEffect(() => {
+    if (token) {
+      axios.defaults.headers.common['x-auth-token'] = token;
+    } else {
+      delete axios.defaults.headers.common['x-auth-token'];
+    }
+  }, [token]);
+
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(user => {
-      setCurrentUser(user);
       setLoading(false);
     });
 
     // Check JWT token
     if (token) {
       loadUser();
+    } else {
+      setLoading(false);
     }
 
     return unsubscribe;
@@ -30,20 +40,16 @@ export function AuthProvider({ children }) {
 
   // Load User from JWT token
   const loadUser = async () => {
-    if (token) {
-      try {
-        const res = await axios.get('/api/auth', {
-          headers: {
-            'x-auth-token': token
-          }
-        });
-        setCurrentUser(res.data);
-        setIsAuthenticated(true);
-      } catch (err) {
-        localStorage.removeItem('token');
-        setToken(null);
-        setIsAuthenticated(false);
-      }
+    try {
+      const res = await axios.get('/api/auth');
+      setCurrentUser(res.data);
+      setIsAuthenticated(true);
+    } catch (err) {
+      console.error('Error loading user:', err);
+      localStorage.removeItem('token');
+      setToken(null);
+      setCurrentUser(null);
+      setIsAuthenticated(false);
     }
     setLoading(false);
   };
@@ -57,7 +63,7 @@ export function AuthProvider({ children }) {
       await loadUser();
       return true;
     } catch (err) {
-      throw err.response.data.msg;
+      throw err.response?.data?.msg || 'Registration failed';
     }
   };
 
@@ -70,7 +76,7 @@ export function AuthProvider({ children }) {
       await loadUser();
       return true;
     } catch (err) {
-      throw err.response.data.msg;
+      throw err.response?.data?.msg || 'Login failed';
     }
   };
 
@@ -81,6 +87,7 @@ export function AuthProvider({ children }) {
     setToken(null);
     setCurrentUser(null);
     setIsAuthenticated(false);
+    delete axios.defaults.headers.common['x-auth-token'];
   };
 
   const value = {
