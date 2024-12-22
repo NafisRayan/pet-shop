@@ -41,13 +41,18 @@ export function AuthProvider({ children }) {
 
   // Load User from JWT token
   const loadUser = async () => {
+    const token = localStorage.getItem('token'); // Get the token from local storage
+    if (token) {
+      axios.defaults.headers.common['x-auth-token'] = token; // Set the token in the headers
+    }
+
     try {
       const res = await axios.get('/api/auth');
       setCurrentUser(res.data);
       setIsAuthenticated(true);
       setIsAdmin(res.data.isAdmin);
     } catch (err) {
-      console.error('Error loading user:', err);
+      console.error('Error loading user:', err.response ? err.response.data : err.message);
       localStorage.removeItem('token');
       setToken(null);
       setCurrentUser(null);
